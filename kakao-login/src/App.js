@@ -9,17 +9,27 @@ class App extends Component {
 
   loginWithKakao = () =>{
     console.log("로그인 버튼클릭됨!");
-    Kakao.Auth.login({
-      success: (auth) => {
-        console.log("정상적인 로그인 성공!");
-        this.setState({
-          isLogin:true
+
+    try{
+      return new Promise((resolve, reject) => {
+        if(!Kakao){
+          reject("카카오 인스턴스가 존재하지 않음!")
+        }
+        Kakao.Auth.login({
+          success: (auth) => {
+            console.log("정상적인 로그인 성공!");
+            this.setState({
+              isLogin:true
+            })
+          },
+          fail:(err) => {
+            console.error(err)
+          }
         })
-      },
-      fail:(err) => {
-        console.error(err)
-      }
-    })
+      }) 
+    }catch(err){
+      console.error(err)
+    }
   }
 
   logoutWithKakao = () => {
@@ -36,14 +46,22 @@ class App extends Component {
   }
 
   render(){
+    const { isLogin } = this.state;
+
+    const loginView = (<div>
+       <p>로그인화면</p>
+        <button onClick={this.loginWithKakao}>카카오 로그인</button>
+    </div>)
+
+    const mainView = (<div>
+      <p>메인화면</p>
+      <button onClick={this.logoutWithKakao}>카카오 로그아웃</button>
+    </div>)
+
+
     return (
       <div>
-        <p>로그인화면</p>
-        <button onClick={this.loginWithKakao}>카카오 로그인</button>
-
-        <p>메인화면</p>
-        <button onClick={this.logoutWithKakao}>카카오 로그아웃</button>
-
+        {isLogin ? mainView : loginView}
       </div>
     );
   }
